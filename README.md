@@ -1,7 +1,7 @@
 # nmap_scanner
 
 ## Description
-A Python script that uses `nmap` to scan and identify vulnerabilities on network ports over TCP and UDP protocols.
+This Python script utilizes nmap to perform targeted network scans, focusing on TCP and limited UDP port checks to identify and warn about potential vulnerabilities in network services. It is designed to quickly assess the security of common services like HTTP, FTP, and SMTP by analyzing service versions against known vulnerabilities.
 
 ## Prerequisites
 Ensure you have the following installed:
@@ -16,6 +16,6 @@ Clone the repository using the following command:
 
 ## Usage
 Run the script from the command line:
-`python script.py`
+`python nmap_scanner.py`
 
-Replace `script.py` with the actual name of your script file if it is different. Adjust the target IP in the script as necessary.
+Adjust the target IP in the script as necessary.
