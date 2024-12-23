@@ -7,10 +7,11 @@ nm = nmap.PortScanner()
 # Define the target for the scan
 target = '192.168.1.1'
 
-# Execute a TCP port scan with modified service version detection and timing
-nm.scan(target, '80,443,21,25,110,143', '-v -sS -sV --version-intensity 5 -T4')
+# Arguments for the main TCP scan
+arguments = '-v -sS -sV --version-intensity 5 -T4 --script auth,vuln,exploit,discovery --script-args=safe --defeat-rst-ratelimit'
+nm.scan(target, '80,443,21,25,110,143', arguments=arguments)
 
-# Print the TCP scan results
+# Save and print results from the main TCP scan
 print("\nTCP Scan Results:")
 for host in nm.all_hosts():
     print(f'Host : {host} ({nm[host].hostname()})')
@@ -24,20 +25,16 @@ for host in nm.all_hosts():
             print(f'port : {port}\tstate : {service_info["state"]}')
             if service_info.get('product'):
                 print(f'Service : {service_info["name"]}, Product : {service_info["product"]}, Version : {service_info["version"]}')
-            
-            # Generic vulnerability checks based on common services
-            if 'http' in service_info['name']:
-                version = service_info['version']
-                product = service_info['product'].lower()
-                if 'apache' in product and version < "2.4.46":
-                    print(f"WARNING: Apache version {version} might be vulnerable. Consider upgrading.")
-                elif 'nginx' in product and version < "1.18.0":
-                    print(f"WARNING: Nginx version {version} might be vulnerable. Consider upgrading.")
-            elif 'ftp' in service_info['name']:
-                version = service_info['version']
-                if 'vsftpd' in service_info['product'] and version < "3.0.3":
-                    print(f"WARNING: vsFTPd version {version} might be vulnerable. Consider upgrading.")
-            elif 'smtp' in service_info['name']:
-                version = service_info['version']
-                if 'exim' in service_info['product'] and version < "4.94.2":
-                    print(f"WARNING: Exim SMTP version {version} might be vulnerable. Consider upgrading.")
+
+# You may remove or comment out the following lines if you don't want to perform additional scans
+# Perform an ACK scan to detect firewall filters
+nm.scan(target, '80,443,21,25,110,143', arguments='-sA')
+
+# Perform a ping scan to see which hosts are up
+nm.scan(target, arguments='-sn')
+
+# Optional: Display command line used for scans and scan info after significant scans only
+if nm.scaninfo():
+    print(nm.command_line())  # Shows the command line Nmap is using
+    print(nm.scaninfo())      # Shows the information about the scan
+print(nm.all_hosts())     # Show all host(s) found
